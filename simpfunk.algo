@@ -6,7 +6,6 @@ Librairie
 
 Variable one_bit en Entier
 Variable buffer en Chaîne
-Variable output_program en Chaîne
 
 Procédure reset()
   one_bit <- 0
