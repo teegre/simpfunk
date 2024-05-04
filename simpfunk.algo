@@ -1,21 +1,20 @@
 Librairie
+# simpfunk:
+# + flip bit
+# . add bit to buffer
+# : print buffer and clear
 
-Tableau tape[] en Entier
-Variable cursor en Entier
+Variable one_bit en Entier
 Variable buffer en Chaîne
-Variable error en Booléen
 Variable output_program en Chaîne
 
 Procédure reset()
-  Redim tape[0]
-  tape[0] <- 0
-  cursor  <- 0
-  error   <- FAUX
+  one_bit <- 0
   buffer  <- ""
 FinProcédure
 
 Fonction bin_pad(char en Caractère) en Chaîne
-  # H → 0100100
+  # H → 72 → 100100 → 0100100
   Variable chars en Caractère*2
   Variable cc en Entier
   Variable res en Chaîne
@@ -33,6 +32,7 @@ Fonction bin_pad(char en Caractère) en Chaîne
 FinFonction
 
 Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
+  # H → 72 → 0100100 → .+.+..+.+..
   Variables bits, program en Chaîne
   Variables bit, idx1, idx2 en Entier
   bits <- ""
@@ -68,6 +68,7 @@ Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
 FinFonction
 
 Fonction get_chars() en Chaîne
+  # 0100100 → 72 → H
   Variable chars en Caractère*2
   Variables sub_buf, string en Chaîne
   Variables idx1, idx2, res en Entier
@@ -86,44 +87,21 @@ Fonction get_chars() en Chaîne
 FinFonction
 
 Procédure flip()
-  # + command
-  Si tape[cursor] = 0 Alors
-    tape[cursor] <- 1
+  # +
+  Si one_bit = 0 Alors
+    one_bit <- 1
   Sinon
-    tape[cursor] <- 0
+    one_bit <- 0
   FinSi
-FinProcédure
-
-Procédure left()
-  # < command
-  cursor <- cursor - 1
-  Si cursor < 0 Alors
-    Ecrire "Error: cursor out of bounds"
-    error <- VRAI
-  FinSi
-FinProcédure
-
-Procédure right()
-  # >
-  cursor <- cursor + 1
-  Si cursor > Taille(tape) - 1 Alors
-    Redim tape[cursor]
-    tape[cursor] <- 0
-  FinSi
-FinProcédure
-
-Procédure home()
-  # command |
-  cursor <- 0
 FinProcédure
 
 Procédure get_bit()
-  # . command
-  buffer <- buffer & Chaîne(tape[cursor])
+  # .
+  buffer <- buffer & Chaîne(one_bit)
 FinProcédure
 
 Procédure print()
-  # : command
+  # :
   Ecrire get_chars() \
   buffer <- ""
 FinProcédure
@@ -134,13 +112,7 @@ Procédure execute(prog en Chaîne)
   reset()
   Pour idx <- 1 à Longueur(prog)
     cmd <- Extraire(prog, idx, 1)
-    Si cmd = "<" Alors
-      left()
-    SinonSi cmd = ">" Alors
-      right()
-    SinonSi cmd = "|" Alors
-      home()
-    SinonSi cmd = "+" Alors
+    Si cmd = "+" Alors
       flip()
     SinonSi cmd = "." Alors
       get_bit()

@@ -1,7 +1,7 @@
 # Simpfunk
 
 ```
-+. sf v0.0.1 .+
++.: sf v0.0.1 :.+
 Simpfunk is an esoteric programming language that prints out strings.
 
 Usage: sf --file <program.sf>

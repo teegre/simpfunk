@@ -1,5 +1,5 @@
 #! /usr/bin/env fralgo
-# vim:ft=fralgo
+# vim: ft=fralgo
 
 Importer "simpfunk"
 
@@ -39,5 +39,4 @@ Début
     help()
   # Leonaarr Te
   FinSi
-
 Fin
