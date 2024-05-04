@@ -1,0 +1,152 @@
+Librairie
+
+Tableau tape[] en Entier
+Variable cursor en Entier
+Variable buffer en Chaîne
+Variable error en Booléen
+Variable output_program en Chaîne
+
+Procédure reset()
+  Redim tape[0]
+  tape[0] <- 0
+  cursor  <- 0
+  error   <- FAUX
+  buffer  <- ""
+FinProcédure
+
+Fonction bin_pad(char en Caractère) en Chaîne
+  # H → 0100100
+  Variable chars en Caractère*2
+  Variable cc en Entier
+  Variable res en Chaîne
+  chars <- "01"
+  cc <- CodeCar(char)
+  res <- ""
+  TantQue cc > 0
+    res <- Extraire(chars, cc % 2 + 1, 1) & res
+    cc <- cc / 2
+  FinTantQue
+  TantQue Longueur(res) < 8
+    res <- "0" & res
+  FinTantQue
+  Retourne res
+FinFonction
+
+Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
+  Variables bits, program en Chaîne
+  Variables bit, idx1, idx2 en Entier
+  bits <- ""
+  program <- ""
+  bit <- 0
+  Pour idx1 <- 1 à Longueur(string)
+    bits <- bin_pad(Extraire(string, idx1, 1))
+    Pour idx2 <- 1 à 8
+      Si Extraire(bits, idx2, 1) = "0" Alors
+        Si bit = 0 Alors
+          program <- program & "."
+        Sinon
+          program <- program & "+."
+        FinSi
+        bit <- 0
+      Sinon
+        Si bit = 1 Alors
+          program <- program & "."
+        Sinon
+          program <- program & "+."
+        FinSi
+        bit <- 1
+      FinSi
+    idx2 Suivant
+    Si one Alors
+      program <- program & ":"
+    FinSi
+  idx1 Suivant
+  Si NON(one) Alors
+    program <- program & ":"
+  FinSi
+  Retourne program
+FinFonction
+
+Fonction get_chars() en Chaîne
+  Variable chars en Caractère*2
+  Variables sub_buf, string en Chaîne
+  Variables idx1, idx2, res en Entier
+  chars <- "01"
+  string <- ""
+  Pour idx1 <- 1 à Longueur(buffer) Pas 8
+    res <- 0
+    sub_buf <- Extraire(buffer, idx1, 8)
+    Pour idx2 <- 1 à 8
+      res <- res * 2
+      res <- res + Trouve(chars, Extraire(sub_buf, idx2, 1)) - 1
+    idx2 Suivant
+    string <- string & Car(res)
+  idx1 Suivant
+  Retourne string
+FinFonction
+
+Procédure flip()
+  # + command
+  Si tape[cursor] = 0 Alors
+    tape[cursor] <- 1
+  Sinon
+    tape[cursor] <- 0
+  FinSi
+FinProcédure
+
+Procédure left()
+  # < command
+  cursor <- cursor - 1
+  Si cursor < 0 Alors
+    Ecrire "Error: cursor out of bounds"
+    error <- VRAI
+  FinSi
+FinProcédure
+
+Procédure right()
+  # >
+  cursor <- cursor + 1
+  Si cursor > Taille(tape) - 1 Alors
+    Redim tape[cursor]
+    tape[cursor] <- 0
+  FinSi
+FinProcédure
+
+Procédure home()
+  # command |
+  cursor <- 0
+FinProcédure
+
+Procédure get_bit()
+  # . command
+  buffer <- buffer & Chaîne(tape[cursor])
+FinProcédure
+
+Procédure print()
+  # : command
+  Ecrire get_chars() \
+  buffer <- ""
+FinProcédure
+
+Procédure execute(prog en Chaîne)
+  Variable idx en Entier
+  Variable cmd en Caractère
+  reset()
+  Pour idx <- 1 à Longueur(prog)
+    cmd <- Extraire(prog, idx, 1)
+    Si cmd = "<" Alors
+      left()
+    SinonSi cmd = ">" Alors
+      right()
+    SinonSi cmd = "|" Alors
+      home()
+    SinonSi cmd = "+" Alors
+      flip()
+    SinonSi cmd = "." Alors
+      get_bit()
+    SinonSi cmd = ":" Alors
+      print()
+    FinSi
+  idx Suivant
+FinProcédure
+

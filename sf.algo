@@ -1,0 +1,43 @@
+#! /usr/bin/env fralgo
+# vim:ft=fralgo
+
+Importer "simpfunk"
+
+Variables prg, buf en Chaîne
+
+Procédure help()
+  Ecrire "+. sf v0.0.1 .+"
+  Ecrire "Simpfunk is an esoteric programming language that prints out strings."
+  Ecrire ""
+  Ecrire "Usage: sf --file <program.sf>"
+  Ecrire "       - Execute program."
+  Ecrire "Usage: sf --dump <string> [-1]"
+  Ecrire "       - Translate a string to a simpfunk program."
+  Ecrire "         * -1: print characters one by one."
+FinProcédure
+
+Début
+  Si Taille(_ARGS) = 1 Alors
+    help()
+  SinonSi _ARGS[1] = "--dump" Alors
+    Si Taille(_ARGS) = 4 Alors
+      prg <- to_funk(_ARGS[2], _ARGS[3] = "-1")
+    Sinon
+      prg <- to_funk(_ARGS[2], FAUX)
+    FinSi
+    Ecrire prg
+  SinonSi _ARGS[1] = "--file" Alors
+    prg <- ""
+    Ouvrir _ARGS[2] sur 1 en Lecture
+    TantQue NON(FDF(1))
+      LireFichier 1, buf
+      prg <- prg & buf
+    FinTantQue
+    execute(prg) 
+    Ecrire ""
+  Sinon
+    help()
+  # Leonaarr Te
+  FinSi
+
+Fin
