@@ -1,19 +1,21 @@
 #! /usr/bin/env fralgo
-# vim: ft=fralgo
+# vim: ft=algo
 
 Importer "simpfunk"
 
-Variables prg, buf en Chaîne
+Variables prg, d_prg, buf en Chaîne
 
 Procédure help()
   Ecrire "+. sf v0.0.1 .+"
   Ecrire "Simpfunk is an esoteric programming language that prints out strings."
   Ecrire ""
-  Ecrire "Usage: sf --file <program.sf>"
-  Ecrire "       - Execute program."
+  Ecrire "Usage: sf --file <program.sfx>"
+  Ecrire "       - Execute a compressed program."
   Ecrire "Usage: sf --dump <string> [-1]"
-  Ecrire "       - Translate a string to a simpfunk program."
+  Ecrire "       - Translate a string to a compressed Simpfunk program."
   Ecrire "         * -1: print characters one by one."
+  Ecrire "Usage: sf --decompress <program.sfx>"
+  Ecrire "       - Decompress a Simpfunk program"
 FinProcédure
 
 Début
@@ -33,8 +35,29 @@ Début
       LireFichier 1, buf
       prg <- prg & buf
     FinTantQue
+    Fermer 1
     execute(prg) 
     Ecrire ""
+  SinonSi _ARGS[1] = "--compress" Alors
+    d_prg <- ""
+    Ouvrir _ARGS[2] sur 1 en Lecture
+    TantQue NON(FDF(1))
+      LireFichier 1, buf
+      d_prg <- d_prg & buf
+    FinTantQue
+    Fermer 1
+    prg <- compress(d_prg)
+    Ecrire prg
+  SinonSi _ARGS[1] = "--decompress" Alors
+    prg <- ""
+    Ouvrir _ARGS[2] sur 1 en Lecture
+    TantQue NON(FDF(1))
+      LireFichier 1, buf
+      prg <- prg & buf
+    FinTantQue
+    Fermer 1
+    d_prg <- decompress(prg)
+    Ecrire d_prg
   Sinon
     help()
   # Leonaarr Te

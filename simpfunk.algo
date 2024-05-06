@@ -56,44 +56,125 @@ Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
         bit <- 1
       FinSi
     idx2 Suivant
+
     Si one Alors
       program <- program & ":"
     FinSi
+
   idx1 Suivant
+
   Si NON(one) Alors
     program <- program & ":"
   FinSi
-  Retourne program
-FinFonction
 
-Fonction entry_index(name en Chaîne, entries[] en Entry) en Entier
-  Variable i en Entier
-  Pour i <- 0 à Taille(entries) - 1
-    Si entries[i].entry = name Alors
-      Retourne i
-    FinSi
-  i Suivant
-  Retourne -1
+  Retourne compress(program)
 FinFonction
 
 Fonction compress(prog en Chaîne) en Chaîne
-  # 01000001 → .+.+.....+. → 2.+5.+.
- Structure Entry
-   entry en Chaîne
-   value en Entier
- FinStructure
- Tableau dict[] en Entry
- Variables i, idx, cpt en Entier
- Variables c, ch, out en Chaîne
- ch <- ""
- Pour i <- 1 à Longueur(prog)
-   c <- Extraire(prog, i, 1)
-   ch <- ch & c
-   idx <- entry_index(ch, dict)
-   Si idx <> -1 Alors
-     cpt <- dict[i].value
-   FinSi
- i Suivant
+  # LZ78 compression
+  # 01000001 → .+.+.....+. → 0.0+1+1.4.2.0:
+  Structure Entry
+    entry en Chaîne
+    value en Entier
+  FinStructure
+
+  Tableau dict[0] en Entry
+  Variables i, idx, e_idx, cpt en Entier
+  Variables c, ch, out en Chaîne
+
+  Fonction entry_index(name en Chaîne, entries[] en Entry) en Entier
+    Variable i en Entier
+    Pour i <- 0 à Taille(entries) - 1
+      Si entries[i].entry = name Alors
+        Retourne i
+      FinSi
+    i Suivant
+    Retourne -1
+  FinFonction
+
+  cpt <- 0
+  idx <- 0
+  ch <- ""
+  out <- ""
+  dict[0] <- "", 0
+
+  Pour i <- 1 à Longueur(prog)
+    c <- Extraire(prog, i, 1)
+    ch <- ch & c
+    e_idx <- entry_index(ch, dict)
+    Si e_idx <> -1 Alors
+      cpt <- dict[e_idx].value
+    Sinon
+      out <- out & Chaîne(cpt) & c
+      cpt <- 0
+      idx <- idx + 1
+      Redim dict[Taille(dict)]
+      dict[Taille(dict) - 1] <- ch, idx
+      ch <- ""
+    FinSi
+  i Suivant
+
+  Si ch <> "" Alors
+    out <- out & Chaîne(cpt)
+  FinSi
+
+  Retourne out
+FinFonction
+
+Fonction decompress(prog en Chaîne) en Chaîne
+  Structure Entry2
+    entry en Entier
+    value en Chaîne
+  FinStructure
+
+  Fonction entry_index(name en Chaîne, entries[] en Entry2) en Entier
+    Variable i en Entier
+    Pour i <- 0 à Taille(entries) - 1
+      Si entries[i].entry = Entier(name) Alors
+        Retourne i
+      FinSi
+    i Suivant
+    Retourne -1
+  FinFonction
+
+  Fonction is_digit(car en Caractère) en Booléen
+    Retourne CodeCar(car) >= 48 ET CodeCar(car) <= 57
+  FinFonction
+
+  Tableau dict[0] en Entry2
+  Variables i, idx, e_idx en Entier
+  Variables n, c, ch, out en Chaîne
+
+  idx <- 1
+  ch <- ""
+  n <- ""
+  out <- ""
+  dict[0] <- 0, ""
+
+  Pour i <- 1 à Longueur(prog)
+    c <- Extraire(prog, i, 1)
+    Si is_digit(c) Alors
+      n <- n & c
+    Sinon
+      e_idx <- entry_index(n, dict)
+      ch <- dict[e_idx].value & c
+      Redim dict[Taille(dict)]
+      dict[Taille(dict) - 1] <- idx, ch
+      idx <- idx + 1
+      n <- ""
+    FinSi
+  i Suivant
+
+  Pour i <- 0 à Taille(dict) - 1
+    out <- out & dict[i].value
+  i Suivant
+
+  Si n <> "" Alors
+    e_idx <- entry_index(n, dict)
+    out <- out & dict[e_idx].value
+  FinSi
+
+  Retourne out
 FinFonction
 
 Fonction get_chars() en Chaîne
@@ -135,10 +216,15 @@ Procédure print()
   buffer <- ""
 FinProcédure
 
-Procédure execute(prog en Chaîne)
+Procédure execute(cprog en Chaîne)
   Variable idx en Entier
   Variable cmd en Caractère
+  Variable prog en Chaîne
+
   reset()
+
+  prog <- decompress(cprog)
+
   Pour idx <- 1 à Longueur(prog)
     cmd <- Extraire(prog, idx, 1)
     Si cmd = "+" Alors
