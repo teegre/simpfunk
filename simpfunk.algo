@@ -66,6 +66,36 @@ Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
   Retourne program
 FinFonction
 
+Fonction entry_index(name en Chaîne, entries[] en Entry) en Entier
+  Variable i en Entier
+  Pour i <- 0 à Taille(entries) - 1
+    Si entries[i].entry = name Alors
+      Retourne i
+    FinSi
+  i Suivant
+  Retourne -1
+FinFonction
+
+Fonction compress(prog en Chaîne) en Chaîne
+  # 01000001 → .+.+.....+. → 2.+5.+.
+ Structure Entry
+   entry en Chaîne
+   value en Entier
+ FinStructure
+ Tableau dict[] en Entry
+ Variables i, idx, cpt en Entier
+ Variables c, ch, out en Chaîne
+ ch <- ""
+ Pour i <- 1 à Longueur(prog)
+   c <- Extraire(prog, i, 1)
+   ch <- ch & c
+   idx <- entry_index(ch, dict)
+   Si idx <> -1 Alors
+     cpt <- dict[i].value
+   FinSi
+ i Suivant
+FinFonction
+
 Fonction get_chars() en Chaîne
   # 0100100 → 72 → H
   Variable chars en Caractère*2
