@@ -30,7 +30,7 @@ Fonction bin_pad(char en Caractère) en Chaîne
   Retourne res
 FinFonction
 
-Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
+Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
   # H → 72 → 0100100 → .+.+..+.+..
   Variables bits, program en Chaîne
   Variables bit, idx1, idx2 en Entier
@@ -67,7 +67,12 @@ Fonction to_funk(string en Chaîne, one en Booléen) en Chaîne
     program <- program & ":"
   FinSi
 
-  Retourne compress(program)
+  Si raw Alors
+    Retourne program
+  Sinon
+    Retourne compress(program)
+  FinSi
+
 FinFonction
 
 Fonction compress(prog en Chaîne) en Chaîne
@@ -81,6 +86,7 @@ Fonction compress(prog en Chaîne) en Chaîne
   Tableau dict[0] en Entry
   Variables i, idx, e_idx, cpt en Entier
   Variables c, ch, out en Chaîne
+  Variables start, end en Numérique
 
   Fonction entry_index(name en Chaîne, entries[] en Entry) en Entier
     Variable i en Entier
@@ -91,6 +97,9 @@ Fonction compress(prog en Chaîne) en Chaîne
     i Suivant
     Retourne -1
   FinFonction
+
+  start <- TempsUnix()
+  EcrireErr "Compressing..."
 
   cpt <- 0
   idx <- 0
@@ -112,11 +121,17 @@ Fonction compress(prog en Chaîne) en Chaîne
       dict[Taille(dict) - 1] <- ch, idx
       ch <- ""
     FinSi
+    EcrireErr "\033[K" & Chaîne(Taille(dict)) & " " & dict[Taille(dict) - 1].entry & "\r" \
   i Suivant
+
+  EcrireErr ""
 
   Si ch <> "" Alors
     out <- out & Chaîne(cpt)
   FinSi
+
+  end <- TempsUnix()
+  EcrireErr "Compressed", 100 - (Longueur(out) / Numérique(Longueur(prog)) * 100)  ,"% in", end - start, "seconds."
 
   Retourne out
 FinFonction
@@ -127,9 +142,17 @@ Fonction decompress(prog en Chaîne) en Chaîne
     value en Chaîne
   FinStructure
 
+  Tableau dict[0] en Entry2
+  Variables i, idx, e_idx en Entier
+  Variables n, c, ch, out en Chaîne
+
   Fonction entry_index(name en Chaîne, entries[] en Entry2) en Entier
     Variable i en Entier
-    Pour i <- 0 à Taille(entries) - 1
+    # Erreur si chaîne vide! Fichier probablement non compressé.
+    Si name = "" Alors
+      Retourne -2
+    FinSi
+    Pour i <- Taille(entries) - 1 à 0 Pas -1
       Si entries[i].entry = Entier(name) Alors
         Retourne i
       FinSi
@@ -140,10 +163,6 @@ Fonction decompress(prog en Chaîne) en Chaîne
   Fonction is_digit(car en Caractère) en Booléen
     Retourne CodeCar(car) >= 48 ET CodeCar(car) <= 57
   FinFonction
-
-  Tableau dict[0] en Entry2
-  Variables i, idx, e_idx en Entier
-  Variables n, c, ch, out en Chaîne
 
   idx <- 1
   ch <- ""
@@ -157,6 +176,10 @@ Fonction decompress(prog en Chaîne) en Chaîne
       n <- n & c
     Sinon
       e_idx <- entry_index(n, dict)
+      Si e_idx = -2 Alors
+        # Fichier non compressé, retourné tel quel.
+        Retourne prog
+      FinSi
       ch <- dict[e_idx].value & c
       Redim dict[Taille(dict)]
       dict[Taille(dict) - 1] <- idx, ch
