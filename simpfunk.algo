@@ -1,5 +1,5 @@
 Librairie
-# simpfunk:
+# Simpfunk:
 # + flip bit
 # . add bit to buffer
 # : print buffer and clear
@@ -136,20 +136,24 @@ Fonction compress(prog en Chaîne) en Chaîne
   Retourne out
 FinFonction
 
-Fonction decompress(prog en Chaîne) en Chaîne
-  Structure Entry2
+Fonction decompress(prog en Chaîne, verbose en Booléen) en Chaîne
+  Structure Entry
     entry en Entier
     value en Chaîne
   FinStructure
 
-  Tableau dict[0] en Entry2
+  Tableau dict[0] en Entry
   Variables i, idx, e_idx en Entier
   Variables n, c, ch, out en Chaîne
+  Variables start, end en Numérique
 
-  Fonction entry_index(name en Chaîne, entries[] en Entry2) en Entier
+  Fonction entry_index(name en Chaîne, entries[] en Entry) en Entier
     Variable i en Entier
     # Erreur si chaîne vide! Fichier probablement non compressé.
     Si name = "" Alors
+      Si verbose Alors
+        EcrireErr "ERROR : this file is not compressed."
+      FinSi
       Retourne -2
     FinSi
     Pour i <- Taille(entries) - 1 à 0 Pas -1
@@ -163,6 +167,11 @@ Fonction decompress(prog en Chaîne) en Chaîne
   Fonction is_digit(car en Caractère) en Booléen
     Retourne CodeCar(car) >= 48 ET CodeCar(car) <= 57
   FinFonction
+
+  Si verbose Alors
+    start <- TempsUnix()
+    EcrireErr "Decompressing..."
+  FinSi
 
   idx <- 1
   ch <- ""
@@ -186,6 +195,9 @@ Fonction decompress(prog en Chaîne) en Chaîne
       idx <- idx + 1
       n <- ""
     FinSi
+    Si verbose Alors
+      EcrireErr "\033[K" & Chaîne(Taille(dict)) & " " & dict[Taille(dict) - 1].value & "\r" \
+    FinSi
   i Suivant
 
   Pour i <- 0 à Taille(dict) - 1
@@ -195,6 +207,12 @@ Fonction decompress(prog en Chaîne) en Chaîne
   Si n <> "" Alors
     e_idx <- entry_index(n, dict)
     out <- out & dict[e_idx].value
+  FinSi
+
+  Si verbose Alors
+    Ecrire ""
+    end <- TempsUnix()
+    EcrireErr "Decompressed in", end - start, "seconds."
   FinSi
 
   Retourne out
@@ -239,14 +257,14 @@ Procédure print()
   buffer <- ""
 FinProcédure
 
-Procédure execute(cprog en Chaîne)
+Fonction execute(cprog en Chaîne) en Booléen
   Variable idx en Entier
   Variable cmd en Caractère
   Variable prog en Chaîne
 
   reset()
 
-  prog <- decompress(cprog)
+  prog <- decompress(cprog, FAUX)
 
   Pour idx <- 1 à Longueur(prog)
     cmd <- Extraire(prog, idx, 1)
@@ -256,7 +274,13 @@ Procédure execute(cprog en Chaîne)
       get_bit()
     SinonSi cmd = ":" Alors
       print()
+    Sinon
+      EcrireErr "SYNTAX ERROR: line #", idx
+      EcrireErr "++ Invalid character >", cmd, "<"
+      Retourne FAUX
     FinSi
   idx Suivant
-FinProcédure
+  Ecrire ""
+  Retourne VRAI
+FinFonction
 
