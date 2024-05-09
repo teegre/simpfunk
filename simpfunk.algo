@@ -4,16 +4,16 @@ Librairie
 # . add bit to buffer
 # : print buffer and clear
 
-Variable one_bit en Entier
+Variable register en Entier
 Variable buffer en Chaîne
 
 Procédure reset()
-  one_bit <- 0
+  register <- 0
   buffer  <- ""
 FinProcédure
 
 Fonction bin_pad(char en Caractère) en Chaîne
-  # H → 72 → 100100 → 0100100
+  # H → 72 → 1001000 → 01001000
   Variable chars en Caractère*2
   Variable cc en Entier
   Variable res en Chaîne
@@ -30,8 +30,12 @@ Fonction bin_pad(char en Caractère) en Chaîne
   Retourne res
 FinFonction
 
+Procédure print_line(string en Chaîne)
+  EcrireErr "\033[K" & string & "\r" \
+FinProcédure
+
 Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
-  # H → 72 → 0100100 → .+.+..+.+..
+  # H → 72 → 01001000 → .+.+..+.+...
   Variables bits, program en Chaîne
   Variables bit, idx1, idx2 en Entier
   bits <- ""
@@ -55,6 +59,7 @@ Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
         FinSi
         bit <- 1
       FinSi
+      print_line(bits & " > " & Extraire(program, 8 * (idx1 - 1) + 1, 8))
     idx2 Suivant
 
     Si one Alors
@@ -67,6 +72,8 @@ Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
     program <- program & ":"
   FinSi
 
+  print_line("")
+
   Si raw Alors
     Retourne program
   Sinon
@@ -77,16 +84,19 @@ FinFonction
 
 Fonction compress(prog en Chaîne) en Chaîne
   # LZ78 compression
-  # 01000001 → .+.+.....+. → 0.0+1+1.4.2.0:
+  # 0 1 00000 1 0000 1 0 1 0
+  # .+.+.....+.+....+.+.+.+.:
+  # 0.0+1+1.4.2.6.4+3.6+1:
   Structure Entry
     entry en Chaîne
     value en Entier
   FinStructure
 
   Tableau dict[0] en Entry
-  Variables i, idx, e_idx, cpt en Entier
+  Variables i, idx, e_idx, cpt, len en Entier
   Variables c, ch, out en Chaîne
-  Variables start, end en Numérique
+  Variables start, end, percent en Numérique
+
 
   Fonction entry_index(name en Chaîne, entries[] en Entry) en Entier
     Variable i en Entier
@@ -99,15 +109,16 @@ Fonction compress(prog en Chaîne) en Chaîne
   FinFonction
 
   start <- TempsUnix()
-  EcrireErr "Compressing..."
+  EcrireErr "\033[?25lCompressing..."
 
   cpt <- 0
   idx <- 0
   ch <- ""
   out <- ""
   dict[0] <- "", 0
+  len <- Longueur(prog)
 
-  Pour i <- 1 à Longueur(prog)
+  Pour i <- 1 à len
     c <- Extraire(prog, i, 1)
     ch <- ch & c
     e_idx <- entry_index(ch, dict)
@@ -121,7 +132,8 @@ Fonction compress(prog en Chaîne) en Chaîne
       dict[Taille(dict) - 1] <- ch, idx
       ch <- ""
     FinSi
-    EcrireErr "\033[K" & Chaîne(Taille(dict)) & " " & dict[Taille(dict) - 1].entry & "\r" \
+    percent <- 100 * i / Numérique(len)
+    EcrireErr "\033[K" & Chaîne(Entier(percent)) & "% " & dict[Taille(dict) - 1].entry & "\r" \
   i Suivant
 
   EcrireErr ""
@@ -131,7 +143,10 @@ Fonction compress(prog en Chaîne) en Chaîne
   FinSi
 
   end <- TempsUnix()
-  EcrireErr "Compressed", 100 - (Longueur(out) / Numérique(Longueur(prog)) * 100)  ,"% in", end - start, "seconds."
+
+  EcrireErr "\033[?25hCompressed " \
+  EcrireErr 100 - (Longueur(out) / Numérique(Longueur(prog)) * 100),"% " \
+  EcrireErr "in", end - start, "seconds."
 
   Retourne out
 FinFonction
@@ -239,16 +254,16 @@ FinFonction
 
 Procédure flip()
   # +
-  Si one_bit = 0 Alors
-    one_bit <- 1
+  Si register = 0 Alors
+    register <- 1
   Sinon
-    one_bit <- 0
+    register <- 0
   FinSi
 FinProcédure
 
 Procédure get_bit()
   # .
-  buffer <- buffer & Chaîne(one_bit)
+  buffer <- buffer & Chaîne(register)
 FinProcédure
 
 Procédure print()

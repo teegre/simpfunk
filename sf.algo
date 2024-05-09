@@ -8,75 +8,52 @@ Variable len en Entier
 
 Procédure help()
   Ecrire "+. sf v0.2.1 .+"
-  Ecrire "Simpfunk is an esoteric programming language that prints out strings."
   Ecrire ""
   Ecrire "Usage:"
   Ecrire "sf --run <program.sf> -- Execute a Simpfunk program."
-  Ecrire "sf --dump <string> [-1] -- Convert a string to a Simpfunk program."
-  Ecrire "sf --dump-compressed <string> [-1] -- Convert a string to a compressed Simpfunk program."
+  Ecrire "sf --gen '<string>' [-1] -- generate a Simpfunk program."
   Ecrire "* -1 adds a print instruction for each character."
   Ecrire "sf --compress <program.sf> -- Compress a Simpfunk program"
   Ecrire "sf --decompress <program.sfx> -- Decompress a Simpfunk program"
   Ecrire ""
-  Ecrire "Simpfunk has only three instructions: '+', '.' and ':'"
-  Ecrire "It has a 1-bit register and its value can be flipped with '+'."
-  Ecrire "'.' copies the current register's value to a buffer and ':'"
-  Ecrire "converts the buffer to a character and prints it. When done,"
-  Ecrire "the buffer is cleared."
-  Ecrire ""
-  Ecrire "Disclaimer: this program is totally useless."
 FinProcédure
+
+Fonction read_program(file en Chaîne) en Chaîne
+  Variables program, buffer en Chaîne
+  program <- ""
+
+  Ouvrir file sur 1 en Lecture
+  TantQue NON(FDF(1))
+    LireFichier 1, buffer
+    program <- program & buffer
+  FinTantQue
+  Fermer 1
+
+  Retourne program
+FinFonction
 
 Début
   len <- Taille(_ARGS)
-  Si len = 1 Alors
-    help()
-  SinonSi _ARGS[1] = "--dump" ET len > 2 Alors
+  Si _ARGS[1] = "--gen" ET len > 2 Alors
     Si len = 4 Alors
       prg <- to_funk(_ARGS[2], _ARGS[3] = "-1", VRAI)
     Sinon
       prg <- to_funk(_ARGS[2], FAUX, VRAI)
     FinSi
     Ecrire prg
-  SinonSi _ARGS[1] = "--dump-compressed" ET len > 2 Alors
-    Si len = 4 Alors
-      prg <- to_funk(_ARGS[2], _ARGS[3] = "-1", FAUX)
-    SinonSi len = 3 Alors
-      prg <- to_funk(_ARGS[2], FAUX, FAUX)
-    FinSi
-    Ecrire prg
   SinonSi _ARGS[1] = "--run" ET len = 3 Alors
-    prg <- ""
-    Ouvrir _ARGS[2] sur 1 en Lecture
-    TantQue NON(FDF(1))
-      LireFichier 1, buf
-      prg <- prg & buf
-    FinTantQue
-    Fermer 1
-    execute(prg) 
-    Ecrire ""
+    prg <- read_program(_ARGS[2])
+    execute(prg)
+    EcrireErr ""
   SinonSi _ARGS[1] = "--compress" ET len = 3 Alors
-    d_prg <- ""
-    Ouvrir _ARGS[2] sur 1 en Lecture
-    TantQue NON(FDF(1))
-      LireFichier 1, buf
-      d_prg <- d_prg & buf
-    FinTantQue
-    Fermer 1
+    d_prg <- read_program(_ARGS[2])
     prg <- compress(d_prg)
     Ecrire prg
   SinonSi _ARGS[1] = "--decompress" ET len = 3 Alors
-    prg <- ""
-    Ouvrir _ARGS[2] sur 1 en Lecture
-    TantQue NON(FDF(1))
-      LireFichier 1, buf
-      prg <- prg & buf
-    FinTantQue
-    Fermer 1
+    prg <- read_program(_ARGS[2])
     d_prg <- decompress(prg, VRAI)
     Ecrire d_prg
   Sinon
     help()
-  # Leonaarr Te
   FinSi
 Fin
