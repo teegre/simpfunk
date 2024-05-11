@@ -45,17 +45,21 @@ Register state: | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
 
 ## sf
 
+### Executing programs
+
 **sf** is an interpreter that runs **Simpfunk** programs.
 
 ```
 sf --run my_program.sf
 ```
 
+### Generate programs
+
 **sf** can also generate a **Simpfunk** program out of a given string:
 
 ```
 $ sf --gen 'Hello, world!'
-.+.+..+.+....+..+..+.+.+.+.+..+.+..+...+..+.+..+...+..+.+....+..+.+.+..+....+.+......+...+.+...+.+..+.+....+.+...+..+.+..+..+.+..+...+..+..+.+....+.+....+.+....+.+.+.+.:
+.+.+..+.+...:.+..+..+.+.+.:+.+..+.+..+..:.+..+.+..+..:.+..+.+....:+..+.+.+..+..:..+.+.....:.+...+.+...:+.+..+.+....:+.+...+..+.+.:.+..+.+..+..:.+..+..+.+..:..+.+....+.:
 $
 ```
 
@@ -74,4 +78,43 @@ $ sf --run hello.sf
 Hello, world!
 $
 ```
+### Compression/Decompression
 
+**sf** can compress a program:
+
+```
+$ sf --compress hello.sf
+0.0+1+1.2.5.1:3.8.5+8:10.8+4+4:9+16.7.6+9.7+14.12.6:22+4.15.6.23.0:23+20.30+20+25.30.19.37.36+22.23:35.22:
+$
+```
+
+**sf** use the LZ78 algorithm.
+
+To save a compressed program, same as above:
+
+```
+$ sf --compress hello.sf > hello.sfx
+Compressing...
+100%
+Compressed 36.904761904761905 % in 0.07976508140563965 seconds.
+$
+```
+
+You can also run a compressed program:
+
+```
+$ sf --run hello.sfx
+Hello, world!
+$
+```
+
+To decompress a program, use:
+
+```
+$ sf --decompress hello.sfx
+Decompressing...
+100%
+Decompressed in 0.07414913177490234 seconds.
+.+.+..+.+...:.+..+..+.+.+.:+.+..+.+..+..:.+..+.+..+..:.+..+.+....:+..+.+.+..+..:..+.+.....:.+...+.+...:+.+..+.+....:+.+...+..+.+.:.+..+.+..+..:.+..+..+.+..:..+.+....+.:
+$
+```

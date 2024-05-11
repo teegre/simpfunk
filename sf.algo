@@ -12,6 +12,7 @@ Procédure help()
   Ecrire "Usage:"
   Ecrire "sf --run <program.sf> -- Execute a Simpfunk program."
   Ecrire "sf --gen '<string>' [-1] -- generate a Simpfunk program."
+  Ecrire "sf --gen-c '<string>' [-1] -- generate a compressed Simpfunk program."
   Ecrire "* -1 adds a print instruction for each character."
   Ecrire "sf --compress <program.sf> -- Compress a Simpfunk program"
   Ecrire "sf --decompress <program.sfx> -- Decompress a Simpfunk program"
@@ -39,6 +40,13 @@ Début
       prg <- to_funk(_ARGS[2], _ARGS[3] = "-1", VRAI)
     Sinon
       prg <- to_funk(_ARGS[2], FAUX, VRAI)
+    FinSi
+    Ecrire prg
+  SinonSi _ARGS[1] = "--gen-c" ET len > 2 Alors
+    Si len = 4 Alors
+      prg <- to_funk(_ARGS[2], _ARGS[3] = "-1", FAUX)
+    Sinon
+      prg <- to_funk(_ARGS[2], FAUX, FAUX)
     FinSi
     Ecrire prg
   SinonSi _ARGS[1] = "--run" ET len = 3 Alors
