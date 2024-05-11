@@ -22,7 +22,7 @@ It has a **1-bit register** and a **buffer**.
 
 ### Example:
 
-A program that prints character `A` followed by a new line.
+A program that prints character `A` followed by a `new line`.
 
 | Char | ASCII | Binary (8-bit) |
 |:----:|:-----:|:--------------:|
@@ -53,13 +53,13 @@ Register state: | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
 sf --run my_program.sf
 ```
 
-### Generate programs
+### Generating programs
 
 **sf** can also generate a **Simpfunk** program out of a given string:
 
 ```
 $ sf --gen 'Hello, world!'
-.+.+..+.+...:.+..+..+.+.+.:+.+..+.+..+..:.+..+.+..+..:.+..+.+....:+..+.+.+..+..:..+.+.....:.+...+.+...:+.+..+.+....:+.+...+..+.+.:.+..+.+..+..:.+..+..+.+..:..+.+....+.:
+.+.+..+.+....+..+..+.+.+.+.+..+.+..+...+..+.+..+...+..+.+....+..+.+.+..+....+.+......+...+.+...+.+..+.+....+.+...+..+.+..+..+.+..+...+..+..+.+....+.+....+.:
 $
 ```
 
@@ -84,11 +84,14 @@ $
 
 ```
 $ sf --compress hello.sf
-0.0+1+1.2.5.1:3.8.5+8:10.8+4+4:9+16.7.6+9.7+14.12.6:22+4.15.6.23.0:23+20.30+20+25.30.19.37.36+22.23:35.22:
+Compressing...
+100%
+Compressed 44.230769230769226 % in 0.06934905052185059 seconds.
+0.0+1+1.2.5.4+7.3.5+9+8+8.9.10.14.6+16.17.15.6.11.4.13.20.20+18+16+12.14+30.13+29.33.9:
 $
 ```
 
-**sf** use the LZ78 algorithm.
+**sf** uses the LZ78 algorithm.
 
 To save a compressed program, same as above:
 
@@ -96,8 +99,20 @@ To save a compressed program, same as above:
 $ sf --compress hello.sf > hello.sfx
 Compressing...
 100%
-Compressed 36.904761904761905 % in 0.07976508140563965 seconds.
+Compressed 44.230769230769226 % in 0.06934905052185059 seconds.
+0.0+1+1.2.5.4+7.3.5+9+8+8.9.10.14.6+16.17.15.6.11.4.13.20.20+18+16+12.14+30.13+29.33.9:
 $
+```
+
+Of course, it is possible to directly generate a compressed program like so:
+
+```
+$ sf --gen-c 'Hello, world!' -1
+Generating...
+Compressing...
+100%
+Compressed 36.904761904761905 % in 0.07067680358886719 seconds.
+0.0+1+1.2.5.1:3.8.5+8:10.8+4+4:9+16.7.6+9.7+14.12.6:22+4.15.6.23.0:23+20.30+20+25.30.19.37.36+22.23:35.22:
 ```
 
 You can also run a compressed program:
@@ -114,7 +129,7 @@ To decompress a program, use:
 $ sf --decompress hello.sfx
 Decompressing...
 100%
-Decompressed in 0.07414913177490234 seconds.
+Decompressed in 0.07161903381347656 seconds.
 .+.+..+.+...:.+..+..+.+.+.:+.+..+.+..+..:.+..+.+..+..:.+..+.+....:+..+.+.+..+..:..+.+.....:.+...+.+...:+.+..+.+....:+.+...+..+.+.:.+..+.+..+..:.+..+..+.+..:..+.+....+.:
 $
 ```
