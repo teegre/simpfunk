@@ -45,14 +45,18 @@ FinProcédure
 Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
   # H → 72 → 01001000 → .+.+..+.+...
   Variables bits, program en Chaîne
-  Variables bit, idx1, idx2 en Entier
+  Variables bit, idx1, idx2, len en Entier
+  Variables start, end, percent en Numérique
+
   bits <- ""
   program <- ""
   bit <- 0
+  len <- Longueur(string)
 
+  start <- TempsUnix()
   EcrireErr "\033[?25lGenerating..."
 
-  Pour idx1 <- 1 à Longueur(string)
+  Pour idx1 <- 1 à len
     bits <- bin_pad(Extraire(string, idx1, 1))
     Pour idx2 <- 1 à 8
       Si Extraire(bits, idx2, 1) = "0" Alors
@@ -70,7 +74,8 @@ Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
         FinSi
         bit <- 1
       FinSi
-      print_line(bits & " > " & Extraire(program, 8 * (idx1 - 1) + 1, 8))
+      percent <- 100 * idx1 / Numérique(len)
+      print_line(Chaîne(Entier(percent)) & " % " & bits & " > " & Extraire(program, 8 * (idx1 - 1) + 1, 8))
     idx2 Suivant
 
     Si one Alors
@@ -83,7 +88,9 @@ Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
     program <- program & ":"
   FinSi
 
-  print_line("\033[?25h")
+  end <- TempsUnix()
+  EcrireErr "Generated", Longueur(program), "instructions in", end - start, "seconds."
+  EcrireErr "\033[?25h" \
 
   Si raw Alors
     Retourne program
