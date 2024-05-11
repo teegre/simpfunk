@@ -12,6 +12,14 @@ Procédure reset()
   buffer  <- ""
 FinProcédure
 
+Procédure error(idx en Entier, cmd en Caractère)
+  EcrireErr "File:", _ARGS[2]
+  EcrireErr "ERROR at position", bin_pad(Car(idx))
+  EcrireErr "+. Invalid character >", cmd, "<"
+  EcrireErr ".: Most likely not a Simpfunk program..."
+  EcrireErr "\033[?25h" \
+FinProcédure
+
 Fonction bin_pad(char en Caractère) en Chaîne
   # H → 72 → 1001000 → 01001000
   Variable chars en Caractère*2
@@ -110,6 +118,10 @@ Fonction compress(prog en Chaîne) en Chaîne
 
   Pour i <- 1 à len
     c <- Extraire(prog, i, 1)
+    Si c <> "+" OU c <> "." OU c <> ":" Alors
+      error(i, c)
+      Retourne ""
+    FinSi
     ch <- ch & c
     Si dict[ch] <> ? Alors
       cpt <- dict[ch]
@@ -168,10 +180,14 @@ Fonction decompress(prog en Chaîne, verbose en Booléen) en Chaîne
 
   Pour i <- 1 à len
     c <- Extraire(prog, i, 1)
+    Ecrire n, c
     Si is_digit(c) Alors
       n <- n & c
     Sinon
-      Si n = "" Alors
+      Si c <> "+" OU c <> "." OU c <> ":" Alors
+        error(i, c)
+        Retourne ""
+      SinonSi n = "" Alors
         # Fichier non compressé, retourné tel quel.
         Retourne prog
       FinSi
@@ -262,10 +278,7 @@ Fonction execute(cprog en Chaîne) en Booléen
     SinonSi cmd = ":" Alors
       print()
     Sinon
-      EcrireErr "File:", _ARGS[2]
-      EcrireErr "ERROR at position ", idx
-      EcrireErr "+. Invalid character >", cmd, "<"
-      EcrireErr ".: Most likely not a Simpfunk program..."
+      error(idx, cmd)
       Retourne FAUX
     FinSi
   idx Suivant
