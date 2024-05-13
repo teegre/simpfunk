@@ -27,7 +27,7 @@ A program that prints character `A` followed by a `new line`.
 | Char | ASCII | Binary (8-bit) |
 |:----:|:-----:|:--------------:|
 | A    | 65    | 01000001       |
-| \n   | 13    | 00001010       |
+| \n   | 10    | 00001010       |
 
 Thus:
 
