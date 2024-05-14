@@ -130,7 +130,7 @@ Fonction compress(prog en Chaîne) en Chaîne
       Retourne ""
     FinSi
     ch <- ch & c
-    Si dict[ch] <> ? Alors
+    Si Existe(dict, ch) Alors
       cpt <- dict[ch]
     Sinon
       out <- out & Chaîne(cpt) & c
