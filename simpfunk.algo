@@ -22,14 +22,13 @@ FinProcédure
 
 Fonction bin_pad(char en Caractère) en Chaîne
   # H → 72 → 1001000 → 01001000
-  Variable chars en Caractère*2
   Variable cc en Entier
   Variable res en Chaîne
   chars <- "01"
   cc <- CodeCar(char)
   res <- ""
   TantQue cc > 0
-    res <- Extraire(chars, cc % 2 + 1, 1) & res
+    res <- res & Chaîne(cc % 2)
     cc <- cc / 2
   FinTantQue
   TantQue Longueur(res) < 8
