@@ -24,11 +24,10 @@ Fonction bin_pad(char en Caractère) en Chaîne
   # H → 72 → 1001000 → 01001000
   Variable cc en Entier
   Variable res en Chaîne
-  chars <- "01"
   cc <- CodeCar(char)
   res <- ""
   TantQue cc > 0
-    res <- res & Chaîne(cc % 2)
+    res <- Chaîne(cc % 2) & res
     cc <- cc / 2
   FinTantQue
   TantQue Longueur(res) < 8
