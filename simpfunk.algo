@@ -149,7 +149,7 @@ Fonction compress(prog en Chaîne) en Chaîne
     print_line(Chaîne(Entier(percent)) & "% " & ch)
   i Suivant
 
-  EcrireErr ""
+  print_line("")
 
   Si ch <> "" Alors
     out <- out & Chaîne(cpt)
@@ -227,7 +227,7 @@ Fonction decompress(prog en Chaîne, verbose en Booléen) en Chaîne
   FinSi
 
   Si verbose Alors
-    EcrireErr ""
+    print_line("")
     end <- TempsUnix()
     EcrireErr "\033[?25hDecompressed in", round(end - start, 2), "seconds."
   FinSi
