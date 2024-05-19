@@ -20,6 +20,14 @@ Procédure error(idx en Entier, cmd en Caractère)
   EcrireErr "\033[?25h" \
 FinProcédure
 
+Fonction round(n en Numérique, p en Entier) en Numérique
+  Variables t, i, f en Chaîne
+  t <- Chaîne(n)
+  i <- Extraire(t, 1, Trouve(t, "."))
+  f <- Extraire(t, Trouve(t, ".") + 1, p)
+  Retourne Numérique(i & f)
+FinFonction
+
 Fonction bin_pad(char en Caractère) en Chaîne
   # H → 72 → 1001000 → 01001000
   Variable cc en Entier
@@ -43,8 +51,8 @@ FinProcédure
 Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
   # H → 72 → 01001000 → .+.+..+.+...
   Variables bits, program en Chaîne
-  Variables bit, idx1, idx2, len en Entier
-  Variables start, end, percent en Numérique
+  Variables bit, idx1, idx2, len, percent en Entier
+  Variables start, end en Numérique
 
   bits <- ""
   program <- ""
@@ -72,7 +80,7 @@ Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
         FinSi
         bit <- 1
       FinSi
-      percent <- 100 * idx1 / Numérique(len)
+      percent <- Entier(100 * idx1 / Numérique(len))
       print_line(Chaîne(Entier(percent)) & " % " & bits & " > " & Extraire(program, 8 * (idx1 - 1) + 1, 8))
     idx2 Suivant
 
@@ -87,7 +95,7 @@ Fonction to_funk(string en Chaîne, one, raw en Booléen) en Chaîne
   FinSi
 
   end <- TempsUnix()
-  EcrireErr "Generated", Longueur(program), "instructions in", end - start, "seconds."
+  EcrireErr "Generated", Longueur(program), "instructions in", round(end - start, 2), "seconds."
   EcrireErr "\033[?25h" \
 
   Si raw Alors
@@ -149,9 +157,11 @@ Fonction compress(prog en Chaîne) en Chaîne
 
   end <- TempsUnix()
 
+  percent <- 100 - (Longueur(out) / Numérique(Longueur(prog)) * 100)
+  percent <- round(percent, 2)
   EcrireErr "\033[?25hCompressed " \
-  EcrireErr 100 - (Longueur(out) / Numérique(Longueur(prog)) * 100),"% " \
-  EcrireErr "in", end - start, "seconds."
+  EcrireErr Chaîne(percent) & "% " \
+  EcrireErr "in", round(end - start, 2), "seconds."
 
   Retourne out
 FinFonction
@@ -219,7 +229,7 @@ Fonction decompress(prog en Chaîne, verbose en Booléen) en Chaîne
   Si verbose Alors
     EcrireErr ""
     end <- TempsUnix()
-    EcrireErr "\033[?25hDecompressed in", end - start, "seconds."
+    EcrireErr "\033[?25hDecompressed in", round(end - start, 2), "seconds."
   FinSi
 
   Retourne out
