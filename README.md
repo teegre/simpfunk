@@ -59,6 +59,8 @@ sf --run my_program.sf
 
 ```
 $ sf --gen 'Hello, world!'
+Generating...
+Generated 156 instructions in 0.13 seconds.
 .+.+..+.+....+..+..+.+.+.+.+..+.+..+...+..+.+..+...+..+.+....+..+.+.+..+....+.+......+...+.+...+.+..+.+....+.+...+..+.+..+..+.+..+...+..+..+.+....+.+....+.:
 $
 ```
@@ -85,8 +87,7 @@ $
 ```
 $ sf --compress hello.sf
 Compressing...
-100%
-Compressed 44.230769230769226 % in 0.06934905052185059 seconds.
+Compressed 44.23% in 0.06 seconds.
 0.0+1+1.2.5.4+7.3.5+9+8+8.9.10.14.6+16.17.15.6.11.4.13.20.20+18+16+12.14+30.13+29.33.9:
 $
 ```
@@ -98,8 +99,7 @@ To save a compressed program, same as above:
 ```
 $ sf --compress hello.sf > hello.sfx
 Compressing...
-100%
-Compressed 44.230769230769226 % in 0.06934905052185059 seconds.
+Compressed 44.23% in 0.06 seconds.
 $
 ```
 
@@ -108,9 +108,9 @@ Of course, it is possible to directly generate a compressed program like so:
 ```
 $ sf --gen-c 'Hello, world!' -1
 Generating...
+Generated 168 instructions in 0.16 seconds.
 Compressing...
-100%
-Compressed 36.904761904761905 % in 0.07067680358886719 seconds.
+Compressed 36.90% in 0.29 seconds.
 0.0+1+1.2.5.1:3.8.5+8:10.8+4+4:9+16.7.6+9.7+14.12.6:22+4.15.6.23.0:23+20.30+20+25.30.19.37.36+22.23:35.22:
 ```
 
@@ -128,7 +128,7 @@ To decompress a program, use:
 $ sf --decompress hello.sfx
 Decompressing...
 100%
-Decompressed in 0.07161903381347656 seconds.
+Decompressed in 0.06 seconds.
 .+.+..+.+...:.+..+..+.+.+.:+.+..+.+..+..:.+..+.+..+..:.+..+.+....:+..+.+.+..+..:..+.+.....:.+...+.+...:+.+..+.+....:+.+...+..+.+.:.+..+.+..+..:.+..+..+.+..:..+.+....+.:
 $
 ```
