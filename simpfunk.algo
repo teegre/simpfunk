@@ -236,18 +236,15 @@ Fonction decompress(prog en Chaîne, verbose en Booléen) en Chaîne
 FinFonction
 
 Fonction get_chars() en Chaîne
-  # 0100100 → 72 → H
-  Variable chars en Caractère*2
+  # 01001000 → 72 → H
   Variables sub_buf, string en Chaîne
   Variables idx1, idx2, res en Entier
-  chars <- "01"
   string <- ""
   Pour idx1 <- 1 à Longueur(buffer) Pas 8
     res <- 0
     sub_buf <- Extraire(buffer, idx1, 8)
     Pour idx2 <- 1 à 8
-      res <- res * 2
-      res <- res + Trouve(chars, Extraire(sub_buf, idx2, 1)) - 1
+      res <- res * 2 + Entier(Extraire(sub_buf, idx2, 1))
     idx2 Suivant
     string <- string & Car(res)
   idx1 Suivant
